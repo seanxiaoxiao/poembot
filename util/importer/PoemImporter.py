@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 CI_RESOURCE_FIEL = "../../resource/ci-set-first"
+CI_TEMPLATE_RESOURCE_FILE = "../../resource/ci-template"
 
 import pymongo
 from pymongo import Connection
@@ -23,10 +24,27 @@ def read_poems(path):
                     poem["title"] = components[2]
                 if len(components) >= 4:
                     poem["summary"] = components[3]
-            elif not poem.get("content-first"):
-                poem["content-first"] = line
+                poem["contents"] = []
             else:
-                poem["content-second"] = line
+                poem["contents"].append(line)
+        return results
+
+def read_template(path):
+    with open(path, "r") as template_file:
+        results = []
+        contents = template_file.readlines()
+        template = {}
+        for line in contents:
+            line = line.strip()
+            if len(line) == 0:
+                if template.get("title"):
+                    results.append(template)
+                    template = {}
+            elif not template.get("title"):
+                template["title"] = line
+                template["contents"] = []
+            else:
+                template["contents"].append(line)
         return results
 
 def import_poems(poems):
@@ -34,10 +52,23 @@ def import_poems(poems):
     poems_collection = db.poems
     poems_collection.insert(poems)
 
+def import_templates(templates):
+    db = Connection().poembot
+    template_collection = db.templates
+    template_collection.insert(templates)
+
 def remove_poems():
     db = Connection().poembot
     db.drop_collection("poems")
 
+def remove_templates():
+    db = Connection().poembot
+    db.drop_collection("templates")
+
 remove_poems()
 poems = read_poems(CI_RESOURCE_FIEL)
 import_poems(poems)
+
+remove_templates()
+templates = read_template(CI_TEMPLATE_RESOURCE_FILE)
+import_templates(templates)
