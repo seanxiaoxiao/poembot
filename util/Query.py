@@ -11,7 +11,15 @@ def show_templates():
             tempates.append(poem.get("template"))
     return tempates
 
-print len(show_templates())
-for template in show_templates():
-    print template
-    
+def character_info():
+	db = Connection().poembot
+	character_collection = db.characters
+	characters = character_collection.find({})
+	character_map = {}
+	for character in characters:
+		character_map[character["char"]] = character["pronunciation"]
+	return character_map["pronunciation"]
+
+character_map = character_info()
+
+
