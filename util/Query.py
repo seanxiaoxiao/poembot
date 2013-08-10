@@ -17,6 +17,11 @@ def show_poem_info():
     poems_collection = db.poems
     return poems_collection.find({})
 
+def template_info():
+    db = Connection().poembot
+    template_collection = db.templates
+    return template_collection.find({})
+
 def character_info():
     db = Connection().poembot
     character_collection = db.characters
