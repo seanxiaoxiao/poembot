@@ -17,6 +17,7 @@ class PoemAnalyzer:
 
     def __init__(self):
         self.templates = template_info()
+        self.char_info = character_info()
 
     def analyze_poems(self):
         poems = show_poem_info()
@@ -36,13 +37,13 @@ class PoemAnalyzer:
         setence_errors = []
         for i in range(len(template.get("contents"))):
             for j in range(len(template.get("contents")[i])):
-                if template.get("contents")[i][j] == 1 or template.get("contents")[i][j] == 4:
-                    if not is_ping_sound(poem.get("contents")[i][j]):
-                        setence_errors.append({"code": PoemError.PRONOCIATION_ERROR, "poem_id": poem.get("_id"),
+                if template.get("contents")[i][j] == '1' or template.get("contents")[i][j] == '4':
+                    if not is_ping_sound(self.char_info.get(poem.get("contents")[i][j])):
+                        setence_errors.append({"code": PoemError.PRONUNCIATION_ERROR, "poem_id": poem.get("_id"),
                                 "wrong_chars": poem.get("contents")[i][j], "actual": poem.get("contents")[i][j]})
-                if template.get("contents")[i][j] == 2 or template.get("contents")[i][j] == 5:
-                    if not is_ze_sound(poem.get("contents")[i][j]):
-                        setence_errors.append({"code": PoemError.PRONOCIATION_ERROR, "poem_id": poem.get("_id"),
+                if template.get("contents")[i][j] == '2' or template.get("contents")[i][j] == '5':
+                    if not is_ze_sound(self.char_info.get(poem.get("contents")[i][j])):
+                        setence_errors.append({"code": PoemError.PRONUNCIATION_ERROR, "poem_id": poem.get("_id"),
                                 "wrong_chars": poem.get("contents")[i][j], "actual": poem.get("contents")[i][j]})
         return setence_errors
             
@@ -74,6 +75,6 @@ for poem in poems:
         for error in errors:
             print error.get("poem_id")
             print error.get("code")
-                
+        
 
 
