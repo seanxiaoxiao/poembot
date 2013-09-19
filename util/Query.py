@@ -15,12 +15,13 @@ def show_templates():
 def show_poem_info():
     db = Connection().poembot
     poems_collection = db.poems
-    return poems_collection.find({})
+    return [poem for poem in poems_collection.find({})]
 
 def template_info():
     db = Connection().poembot
     template_collection = db.templates
-    return template_collection.find({})
+    return [template for template in template_collection.find({})]
+    
 
 def character_info():
     db = Connection().poembot
