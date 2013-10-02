@@ -21,7 +21,8 @@ def find_ci_template():
 
 templates = find_ci_template()
 templates = sorted(templates.iteritems(), key=lambda d:d[1], reverse = True)
-for i in range(10):
-    print "%s : %s" % (templates[i][0], templates[i][1])
+for template in templates:
+    if template[1] > 10:
+        print "%s : %s" % (template[0], template[1])
 
 
