@@ -4,13 +4,57 @@ import urllib2
 from BeautifulSoup import BeautifulSoup
 from PoemImporter import remove_templates
 from PoemImporter import import_templates
+from PoemImporter import remove_poems
+from PoemImporter import import_poems
 
-ROOT_URL = "http://longyusheng.org/cipai/mulu.html"
+
+TEMPLATE_ROOT_URL = "http://longyusheng.org/cipai/mulu.html"
+POEM_ROOT_URL = "http://www.guoxue.com/qsc/qscml%d.htm"
 
 
-def parse_root():
+def parse_poem_root():
+    for i in range(1, 26):
+        url = POEM_ROOT_URL % i
+        print url
+        content_stream = urllib2.urlopen(url)
+        content = content_stream.read()
+        soup = BeautifulSoup(content.decode('gb2312','ignore'))
+        blockquotes = soup.body.findAll('blockquote')
+        for blockquote in blockquotes:
+            links = blockquote.findAll('a')
+            for link in links:
+                author = link.text
+                try:
+                    poem_url = "http://www.guoxue.com/qsc/" + link.get('href')
+                    poems = parse_poem(poem_url)
+                    import_poems(poems)
+                except:
+                    pass
+
+def parse_poem(url):
+    print url
+    content_stream = urllib2.urlopen(url)
+    content = content_stream.read()
+    soup = BeautifulSoup(content.decode('gb2312','ignore'))
+    paragraphs = soup.body.findAll('p', {'align': 'center'})
+    poems = []
+    for paragraph in paragraphs:
+        poem = {}
+        template_with_title = paragraph.text
+        index = template_with_title.find(u'（')
+        if index >= 0:
+            poem['template'] = template_with_title[0: index]
+            end_index = template_with_title.find(u'）')
+            poem['title'] = template_with_title[index + 1: end_index]
+        else:
+            poem['template'] = template_with_title
+        poem['contents'] = paragraph.findNextSibling().text.split('&nbsp;&nbsp;&nbsp;&nbsp;')[1:]
+        poems.append(poem)
+    return poems
+
+def parse_template_root():
     templates = []
-    content_stream = urllib2.urlopen(ROOT_URL)
+    content_stream = urllib2.urlopen(TEMPLATE_ROOT_URL)
     content = content_stream.read()
     soup = BeautifulSoup(content.decode('gb2312','ignore'))
     spans = soup.body.findAll('span', {'class': 'item'})
@@ -58,6 +102,9 @@ def parse_template(url):
         template_infos.append(contents)
     return template_infos
 
-remove_templates()
-templates = parse_root()
-import_templates(templates)
+remove_poems()
+parse_poem_root()
+
+# remove_templates()
+# templates = parse_template_root()
+# import_templates(templates)
