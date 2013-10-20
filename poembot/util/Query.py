@@ -21,7 +21,6 @@ def template_info():
     db = Connection().poembot
     template_collection = db.templates
     return [template for template in template_collection.find({})]
-    
 
 def character_info():
     db = Connection().poembot

@@ -173,16 +173,16 @@ def remove_characters():
     db = Connection().poembot
     db.drop_collection("characters")
 
-remove_poems()
-poems = read_poems(CI_RESOURCE_FIEL)
-import_poems(poems)
+# remove_poems()
+# poems = read_poems(CI_RESOURCE_FIEL)
+# import_poems(poems)
 
-remove_templates()
-templates = read_template(CI_TEMPLATE_RESOURCE_FILE)
-import_templates(templates)
+# remove_templates()
+# templates = read_template(CI_TEMPLATE_RESOURCE_FILE)
+# import_templates(templates)
 
-remove_characters()
-characters = read_character(CI_CHARACTER_FILE)
-import_characters(characters)
+# remove_characters()
+# characters = read_character(CI_CHARACTER_FILE)
+# import_characters(characters)
 
 

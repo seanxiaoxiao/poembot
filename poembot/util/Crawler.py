@@ -105,6 +105,6 @@ def parse_template(url):
 remove_poems()
 parse_poem_root()
 
-# remove_templates()
-# templates = parse_template_root()
-# import_templates(templates)
+remove_templates()
+templates = parse_template_root()
+import_templates(templates)

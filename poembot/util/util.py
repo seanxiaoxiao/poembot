@@ -1,11 +1,71 @@
 # -*- coding: utf-8 -*-
-from Query import show_poem_info, character_info
+from Query import show_poem_info, character_info, template_info
 import re
 import operator
 
 characters = character_info()
 character_posibility = {}
 
+p = re.compile(u"，|。|、", re.UNICODE)
+template_rule_pattern = re.compile("[0-9|A-E]+", re.UNICODE)
+
+
+def preprocess_template(template):
+    if template.get("refined_contents"):
+        return
+    template["refined_contents"] = []
+    for content in template.get("contents"):
+        refined_contents = p.split(content)
+        for refined_content in refined_contents:
+            if len(refined_content) > 0:
+                refined_content = refined_content.replace(u'仄（增韵）', '4')
+                refined_content = refined_content.replace(u'平（增韵）', '3')
+                refined_content = refined_content.replace(u'仄（韵）', '4')
+                refined_content = refined_content.replace(u'平（韵）', '3')
+                refined_content = refined_content.replace(u'中', '2')
+                refined_content = refined_content.replace(u'平', '0')
+                refined_content = refined_content.replace(u'仄', '1')
+                refined_content = refined_content.replace(u'去', '1')
+                if refined_content.find(u'『') >= 0 or refined_content.find(u'』') >= 0:
+                    new_refined_content = ""
+                    for char in refined_content:
+                        try:
+                            if int(char) in range(0, 5):
+                                new_refined_content += str((int(char) + 5))
+                        except:
+                            pass
+                    template["refined_contents"].append(new_refined_content)
+                elif refined_content.find(u'〖') >= 0 and refined_content.find(u'〗') >= 0:
+                    new_refined_content = ""
+                    for char in refined_content:
+                        try:
+                            if int(char) in range(0, 5):
+                                new_refined_content += "%x" % (int(char) + 10)
+                        except:
+                            pass
+                    last_rule = template["refined_contents"][len(template["refined_contents"]) - 1]
+                    new_last_rule = ""
+                    for char in last_rule:
+                        try:
+                            if int(char) in range(0, 5):
+                                new_last_rule += "%x" % (int(char) + 10)
+                        except:
+                            pass
+                    if len(new_last_rule) == len(last_rule):
+                        template["refined_contents"][len(template["refined_contents"]) - 1] = new_last_rule
+                    template["refined_contents"].append(new_refined_content)
+                elif refined_content.find(u'〖') >= 0 or refined_content.find(u'〗') >= 0:
+                    new_refined_content = ""
+                    for char in refined_content:
+                        try:
+                            if int(char) in range(0, 5):
+                                new_refined_content += "%x" % (int(char) + 10)
+                        except:
+                            pass
+                    template["refined_contents"].append(new_refined_content)
+                else:                    
+                    template["refined_contents"].append(refined_content)
+                
 
 def is_ping_sound(pronunciation):
     tune = pronunciation[len(pronunciation) - 1]
@@ -18,7 +78,6 @@ def is_ze_sound(pronunciation):
     return tune == 3 or tune == 4 or tune == 0
 
 def _analyse_content(poem, contents):
-    p = re.compile(u"，|。|、", re.UNICODE)
     contents_after_split = p.split(contents)
     for content in contents_after_split:
         if len(content) == 0:
@@ -59,4 +118,6 @@ def possibility():
         sorted(item[1].get("prefixs"), key=lambda x: x.get("count"))
     print sorted_character_posibility
 
-possibility()
+templates = template_info()
+for template in templates:
+    preprocess_template(template)

@@ -6,6 +6,7 @@ from Query import template_info
 
 from util import is_ping_sound
 from util import is_ze_sound
+from util import preprocess_template
 
 class PoemError:
     NO_TEMPLATE = 1
@@ -17,6 +18,8 @@ class PoemAnalyzer:
 
     def __init__(self):
         self.templates = template_info()
+        for template in self.templates:
+            preprocess_template(template)
         self.char_info = character_info()
 
     def analyze_poems(self):
