@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Query import show_poem_info, character_info, template_info
+from PoemImporter import import_tokens
 import re
 import operator
 
@@ -116,8 +117,22 @@ def possibility():
     sorted_character_posibility = sorted(character_posibility.iteritems(), key=lambda x: x[1].get("count"))
     for item in sorted_character_posibility:
         sorted(item[1].get("prefixs"), key=lambda x: x.get("count"))
-    print sorted_character_posibility
+    return sorted_character_posibility
 
-templates = template_info()
-for template in templates:
-    preprocess_template(template)
+def possibility_to_tokens():
+    poems = show_poem_info()
+    for poem in poems:
+        contents = poem.get("contents")
+        for content in contents:
+            _analyse_content(poem, content)
+    tokens = []
+    for key in character_posibility:
+        char_info = character_posibility.get(key)
+        for prefix in char_info.get("prefixs"):
+            token = {}
+            token["content"] = prefix.get("char") + key
+            token["count"] = prefix.get("count")
+            tokens.append(token)
+    import_tokens(tokens)
+
+possibility_to_tokens()

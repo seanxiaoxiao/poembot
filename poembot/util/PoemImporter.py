@@ -173,6 +173,15 @@ def remove_characters():
     db = Connection().poembot
     db.drop_collection("characters")
 
+def import_tokens(tokens):
+    db = Connection().poembot
+    token_collection = db.tokens
+    token_collection.insert(tokens)
+
+def remove_tokens():
+    db = Connection.poembot
+    db.drop_collection("tokens")
+
 # remove_poems()
 # poems = read_poems(CI_RESOURCE_FIEL)
 # import_poems(poems)
