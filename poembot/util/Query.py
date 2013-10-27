@@ -28,9 +28,20 @@ def character_info():
     characters = character_collection.find({})
     character_map = {}
     for character in characters:
-        character_map[character["char"]] = character["pronunciation"]
+        character_map[character["char"]] = character
     return character_map
 
+def find_poems_by_template(template):
+    db = Connection().poembot
+    poems_collection = db.poems
+    return [poem for poem in poems_collection.find({"template": template})]
+
+def find_templates_by_title(title):
+    db = Connection().poembot
+    template_collection = db.templates
+    return [template for template in template_collection.find({"title": title})]
+
 # character_map = character_info()
+
 
 

@@ -10,7 +10,6 @@ character_posibility = {}
 p = re.compile(u"，|。|、", re.UNICODE)
 template_rule_pattern = re.compile("[0-9|A-E]+", re.UNICODE)
 
-
 def preprocess_template(template):
     if template.get("refined_contents"):
         return
@@ -68,15 +67,21 @@ def preprocess_template(template):
                     template["refined_contents"].append(refined_content)
                 
 
-def is_ping_sound(pronunciation):
-    tune = pronunciation[len(pronunciation) - 1]
-    tune = int(tune[len(tune) - 1])
-    return tune == 1 or tune == 2 or tune == 0
+def is_ping_sound(character):
+    for pronunciation in character.get("pronunciation"):
+        tune = pronunciation[len(pronunciation) - 1]
+        tune = int(tune[len(tune) - 1])
+        if tune == 1 or tune == 2 or tune == 0:
+            return True
+    return False
 
-def is_ze_sound(pronunciation):
-    tune = pronunciation[len(pronunciation) - 1]
-    tune = int(tune[len(tune) - 1])
-    return tune == 3 or tune == 4 or tune == 0
+def is_ze_sound(character):
+    for pronunciation in character.get("pronunciation"):
+        tune = pronunciation[len(pronunciation) - 1]
+        tune = int(tune[len(tune) - 1])
+        if tune == 3 or tune == 4 or tune == 0:
+            return True
+    return False
 
 def _analyse_content(poem, contents):
     contents_after_split = p.split(contents)
@@ -128,6 +133,10 @@ def possibility_to_tokens():
     tokens = []
     for key in character_posibility:
         char_info = character_posibility.get(key)
+        single_word_token = {}
+        single_word_token["content"] = key
+        single_word_token["count"] = char_info.get("count")
+        tokens.append(single_word_token)
         for prefix in char_info.get("prefixs"):
             token = {}
             token["content"] = prefix.get("char") + key
@@ -135,4 +144,3 @@ def possibility_to_tokens():
             tokens.append(token)
     import_tokens(tokens)
 
-possibility_to_tokens()
