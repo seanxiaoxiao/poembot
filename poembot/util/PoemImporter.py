@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 CI_RESOURCE_FIEL = "../../resource/ci-set-first"
 CI_TEMPLATE_RESOURCE_FILE = "../../resource/ci-template"
-CI_CHARACTER_FILE = "../../resource/pinyin.txt"
 
 import pymongo
 from pymongo import Connection
@@ -182,16 +181,5 @@ def remove_tokens():
     db = Connection.poembot
     db.drop_collection("tokens")
 
-# remove_poems()
-# poems = read_poems(CI_RESOURCE_FIEL)
-# import_poems(poems)
-
-# remove_templates()
-# templates = read_template(CI_TEMPLATE_RESOURCE_FILE)
-# import_templates(templates)
-
-# remove_characters()
-# characters = read_character(CI_CHARACTER_FILE)
-# import_characters(characters)
 
 

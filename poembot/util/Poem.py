@@ -4,6 +4,7 @@ from Query import show_poem_info, character_info, template_info
 from Query import find_poems_by_template, find_templates_by_title
 from util import preprocess_template, is_ping_sound, is_ze_sound
 import re
+import string
 
 templates = template_info()
 characters = character_info()
@@ -14,11 +15,12 @@ for template in templates:
         templates_map[template.get('title')] = []
     templates_map[template.get('title')].append(template)
 
-poems_info = find_poems_by_template(u'西江月')
+poems_info = find_poems_by_template(u'满江红')
 
 missing_template = {}
 
 p = re.compile(u"，|。|、", re.UNICODE)
+
 
 class Poem:
 
@@ -26,6 +28,8 @@ class Poem:
         self.poem = poem
         self.templates = []
         self._preprocess_poem()
+        self.incorrect_chars = []
+        self.is_valid = True
 
     def _preprocess_poem(self):
         self.poem["refined_contents"] = []
@@ -43,10 +47,10 @@ class Poem:
     def validate(self):
         for template in self.templates:
             if self.match_length(template):
+                self.is_valid = True
                 self.match_rhythm(template)
-                break
             else:
-                print self.poem.get("_id")
+                self.is_valid = False
 
     def match_length(self, template):
         if len(self.poem.get("refined_contents")) != len(template.get("refined_contents")):
@@ -74,29 +78,23 @@ class Poem:
                     continue
                 if rule_code % 5 == 0 or rule_code % 5 == 3:
                     if not is_ping_sound(character):
-                        print "Wrong one char " + poem_char
-                        self.print_poem()
-                        return False
+                        self.incorrect_chars.append(poem_char)
                 elif rule_code % 5 == 1 or rule_code % 5 == 4:
                     if not is_ze_sound(character):
-                        print "Wrong one char " + poem_char
-                        self.print_poem()
-                        return False
+                        self.incorrect_chars.append(poem_char)
                 if rule_code >= 10 and i > 0 and template.get("refined_contents")[i - 1][j] >= 10:
                     if poem_char != self.poem.get("refined_contents")[i - 1][j]:
-                        print "Wrong one char " + poem_char
-                        self.print_poem()
-                        return False
-        return True
+                        self.incorrect_chars.append(poem_char)
 
     def print_poem(self):
-        pass
-        # if not missing_template.get(self.poem.get("template")):
-        #     missing_template[self.poem.get("template")] = self.poem.get("template")
         print u"ID is %s" % self.poem.get("_id")
         print u"词牌: %s" % self.poem.get("template")
         for content in self.poem.get("contents"):
-          print content
+            print content
+        print u"Incorrect words: " + string.join(self.incorrect_chars, ",")
+
+    def is_perfect_poem(self):
+        return self.is_valid and len(self.incorrect_chars) == 0
 
 poems = []
 
@@ -106,7 +104,8 @@ for poem_info in poems_info:
     if matched_templates:
         poem_instance.add_template(matched_templates)
     if len(poem_instance.templates) >= 0:
-        # poem_instance.print_poem()
         poem_instance.validate()
+        if len(poem_instance.incorrect_chars) > 0:
+            poem_instance.print_poem()
     poems.append(poem_instance)
 

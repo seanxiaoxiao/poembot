@@ -2,10 +2,8 @@
 
 import urllib2
 from BeautifulSoup import BeautifulSoup
-from PoemImporter import remove_templates
-from PoemImporter import import_templates
-from PoemImporter import remove_poems
-from PoemImporter import import_poems
+
+
 
 
 TEMPLATE_ROOT_URL = "http://longyusheng.org/cipai/mulu.html"
@@ -102,9 +100,4 @@ def parse_template(url):
         template_infos.append(contents)
     return template_infos
 
-remove_poems()
-parse_poem_root()
 
-remove_templates()
-templates = parse_template_root()
-import_templates(templates)
