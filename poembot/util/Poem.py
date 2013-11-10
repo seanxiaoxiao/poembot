@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Query import show_poem_info, character_info, template_info
-from Query import find_poems_by_template, find_templates_by_title
+from Query import character_info, template_info, find_poems_by_template
 from util import preprocess_template, is_ping_sound, is_ze_sound
 import re
 import string

@@ -2,7 +2,6 @@
 CI_RESOURCE_FIEL = "../../resource/ci-set-first"
 CI_TEMPLATE_RESOURCE_FILE = "../../resource/ci-template"
 
-import pymongo
 from pymongo import Connection
 
 def read_poems(path):
@@ -178,7 +177,7 @@ def import_tokens(tokens):
     token_collection.insert(tokens)
 
 def remove_tokens():
-    db = Connection.poembot
+    db = Connection().poembot
     db.drop_collection("tokens")
 
 

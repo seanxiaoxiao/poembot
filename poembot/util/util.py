@@ -83,7 +83,7 @@ def is_ze_sound(character):
             return True
     return False
 
-def _analyse_content(poem, contents):
+def _analyse_content(contents):
     contents_after_split = p.split(contents)
     for content in contents_after_split:
         if len(content) == 0:
@@ -92,24 +92,26 @@ def _analyse_content(poem, contents):
         current_char = content[0]
         if current_char in characters:
             if not character_posibility.get(current_char):
-                character_posibility[current_char] = {"count": 0, "prefixs": []}
+                character_posibility[current_char] = {"count": 0, "suffixes": [], "leading_count": 0}
             character_posibility[current_char]["count"] += 1
 
-        for i in range(1, len(content)):
+        for i in range(0, len(content) - 1):
             current_char = content[i]
-            last_char = content[i - 1]
-            if current_char in characters and last_char in characters:
+            next_char = content[i + 1]
+            if current_char in characters and next_char in characters:
                 if not character_posibility.get(current_char):
-                    character_posibility[current_char] = {"count": 0, "prefixs": []}
+                    character_posibility[current_char] = {"count": 0, "suffixes": [], "leading_count": 0}
+                if i == 0:
+                    character_posibility[current_char]["leading_count"] += 1
                 character_posibility[current_char]["count"] += 1
-                new_prefix = True
-                for prefix in character_posibility[current_char]["prefixs"]:
-                    if prefix.get("char") == last_char:
-                        prefix["count"] += 1
-                        new_prefix = False
+                new_suffix = True
+                for suffix in character_posibility[current_char]["suffixes"]:
+                    if suffix.get("char") == next_char:
+                        suffix["count"] += 1
+                        new_suffix = False
                         break
-                if new_prefix:
-                    character_posibility[current_char]["prefixs"].append({"char": last_char, "count": 1})
+                if new_suffix:
+                    character_posibility[current_char]["suffixes"].append({"char": next_char, "count": 1})
             else:
                 pass
 
@@ -118,10 +120,10 @@ def possibility():
     for poem in poems:
         contents = poem.get("contents")
         for content in contents:
-            _analyse_content(poem, content)
+            _analyse_content(content)
     sorted_character_posibility = sorted(character_posibility.iteritems(), key=lambda x: x[1].get("count"))
     for item in sorted_character_posibility:
-        sorted(item[1].get("prefixs"), key=lambda x: x.get("count"))
+        sorted(item[1].get("suffixes"), key=lambda x: x.get("count"))
     return sorted_character_posibility
 
 def possibility_to_tokens():
@@ -129,18 +131,19 @@ def possibility_to_tokens():
     for poem in poems:
         contents = poem.get("contents")
         for content in contents:
-            _analyse_content(poem, content)
+            _analyse_content(content)
     tokens = []
     for key in character_posibility:
         char_info = character_posibility.get(key)
         single_word_token = {}
         single_word_token["content"] = key
         single_word_token["count"] = char_info.get("count")
+        single_word_token["leading_count"] = char_info.get("leading_count")
         tokens.append(single_word_token)
-        for prefix in char_info.get("prefixs"):
+        for suffix in char_info.get("suffixes"):
             token = {}
-            token["content"] = prefix.get("char") + key
-            token["count"] = prefix.get("count")
+            token["content"] = key + suffix.get("char")
+            token["count"] = suffix.get("count")
             tokens.append(token)
     import_tokens(tokens)
 

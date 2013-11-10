@@ -2,8 +2,7 @@
 
 import urllib2
 from BeautifulSoup import BeautifulSoup
-
-
+from PoemImporter import import_poems
 
 
 TEMPLATE_ROOT_URL = "http://longyusheng.org/cipai/mulu.html"
