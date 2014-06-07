@@ -3,7 +3,7 @@ from optparse import OptionGroup
 import sys
 
 from PoemImporter import remove_templates, import_templates, import_characters
-from PoemImporter import remove_poems, remove_characters, read_character, remove_tokens
+from PoemImporter import remove_poems, remove_characters, read_character, remove_tokens, remove_authors
 from Crawler import parse_template_root, parse_poem_root
 from util import possibility_to_tokens
 
@@ -26,6 +26,8 @@ def import_template():
 def import_poem():
     print "Begin Importing Poems"
     remove_poems()
+    remove_authors()
+    remove_templates()
     parse_poem_root()
     print "End Importing Poems"
 

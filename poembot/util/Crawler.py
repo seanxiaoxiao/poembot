@@ -3,11 +3,13 @@
 import urllib2
 from BeautifulSoup import BeautifulSoup
 from PoemImporter import import_poems
-
+from PoemImporter import import_authors
+from PoemImporter import import_templates
 
 TEMPLATE_ROOT_URL = "http://longyusheng.org/cipai/mulu.html"
 POEM_ROOT_URL = "http://www.guoxue.com/qsc/qscml%d.htm"
 
+templates = {}
 
 def parse_poem_root():
     for i in range(1, 26):
@@ -20,15 +22,18 @@ def parse_poem_root():
         for blockquote in blockquotes:
             links = blockquote.findAll('a')
             for link in links:
-                author = link.text
+                author_name = link.text.strip()
+                print "Importing for " + author_name
+                author = {"name": author_name, "dynasty": "Song"}
+                import_authors(author)
                 try:
                     poem_url = "http://www.guoxue.com/qsc/" + link.get('href')
-                    poems = parse_poem(poem_url)
+                    poems = parse_poem(poem_url, author)
                     import_poems(poems)
                 except:
                     pass
 
-def parse_poem(url):
+def parse_poem(url, author):
     print url
     content_stream = urllib2.urlopen(url)
     content = content_stream.read()
@@ -37,14 +42,17 @@ def parse_poem(url):
     poems = []
     for paragraph in paragraphs:
         poem = {}
+        poem['author'] = author["_id"]
         template_with_title = paragraph.text
         index = template_with_title.find(u'（')
+        template_name = None
         if index >= 0:
-            poem['template'] = template_with_title[0: index]
+            template_name = template_with_title[0: index]
             end_index = template_with_title.find(u'）')
             poem['title'] = template_with_title[index + 1: end_index]
         else:
-            poem['template'] = template_with_title
+            template_name = template_with_title
+        poem['template'] = create_template(template_name)["_id"]
         poem['contents'] = paragraph.findNextSibling().text.split('&nbsp;&nbsp;&nbsp;&nbsp;')[1:]
         poems.append(poem)
     return poems
@@ -99,4 +107,9 @@ def parse_template(url):
         template_infos.append(contents)
     return template_infos
 
-
+def create_template(template_name):
+    if not templates.get(template_name):
+        template = {"name": template_name}
+        import_templates(template)
+        templates[template_name] = template
+    return templates[template_name]

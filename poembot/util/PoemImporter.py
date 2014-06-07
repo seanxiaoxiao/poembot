@@ -180,5 +180,13 @@ def remove_tokens():
     db = Connection().poembot
     db.drop_collection("tokens")
 
+def import_authors(authors):
+    db = Connection().poembot
+    authors_collection = db.authors
+    authors_collection.insert(authors)
+
+def remove_authors():
+    db = Connection().poembot
+    db.drop_collection("authors")
 
 

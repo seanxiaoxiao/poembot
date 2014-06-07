@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Query import character_info, template_info, find_poems_by_template
+from Query import character_info, template_info, show_poem_info
 from util import preprocess_template, is_ping_sound, is_ze_sound
 import re
 import string
@@ -14,7 +14,7 @@ for template in templates:
         templates_map[template.get('title')] = []
     templates_map[template.get('title')].append(template)
 
-poems_info = find_poems_by_template(u'满江红')
+poems_info = show_poem_info()
 
 missing_template = {}
 
@@ -50,6 +50,15 @@ class Poem:
                 self.match_rhythm(template)
             else:
                 self.is_valid = False
+
+    def is_intact_poem(self):
+        for content in self.poem.get("refined_contents"):
+            for char in content:
+                if char != u'□' and not characters.get(char):
+                    print char
+                    self.print_poem()
+                    return False
+        return True
 
     def match_length(self, template):
         if len(self.poem.get("refined_contents")) != len(template.get("refined_contents")):
@@ -99,12 +108,13 @@ poems = []
 
 for poem_info in poems_info:
     poem_instance = Poem(poem_info)
-    matched_templates = templates_map.get(poem_info.get("template"))
-    if matched_templates:
-        poem_instance.add_template(matched_templates)
-    if len(poem_instance.templates) >= 0:
-        poem_instance.validate()
-        if len(poem_instance.incorrect_chars) > 0:
-            poem_instance.print_poem()
-    poems.append(poem_instance)
+    poem_instance.is_intact_poem()
+    # matched_templates = templates_map.get(poem_info.get("template"))
+    # if matched_templates:
+    #     poem_instance.add_template(matched_templates)
+    # if len(poem_instance.templates) >= 0:
+    #     poem_instance.validate()
+    #     if len(poem_instance.incorrect_chars) > 0:
+    #         poem_instance.print_poem()
+    # poems.append(poem_instance)
 
